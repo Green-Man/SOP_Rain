@@ -1,7 +1,5 @@
 #include <stdlib.h>
 
-//GIT
-
 #include <UT/UT_DSOVersion.h>
 #include <GU/GU_Detail.h>
 #include <PRM/PRM_Include.h>
