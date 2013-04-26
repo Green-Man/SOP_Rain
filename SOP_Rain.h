@@ -19,16 +19,16 @@ private:
     static int pointsNumberChanged(void *,int,float,const PRM_Template *);
     fpreal  SPEED(float t)   { return evalFloat( 0, 0, t); }
     fpreal  FPS(float t)   { return evalFloat( 1, 0, t); }
-    fpreal* BOUNDMIN(float t)
+    UT_Vector3 BOUNDMIN(float t)
             {
-                static fpreal vals[3];
+                static UT_Vector3 vals;
                 for(int i = 0; i < 3; i++)
                     vals[i] = evalFloat( 2, i, t);
                 return vals; 
             }
-    fpreal* BOUNDMAX(fpreal t)                     //TODO: change to eval all
+    UT_Vector3 BOUNDMAX(fpreal t)                     //TODO: change to eval all
             {                                      // parm by name
-                static fpreal vals[3];
+                static UT_Vector3 vals;
                 for(int i = 0; i < 3; i++)
                     vals[i] = evalFloat( 3, i, t);
                 return vals; 
@@ -47,9 +47,6 @@ private:
             }  
     fpreal  SPEEDVARIENCE(float t)   { return evalFloat( 9, 0, t); }
     fpreal  TIME(float t)   { return evalFloat( 10, 0, t); }
-
-    UT_Matrix3 computeRotationMatrix(UT_Vector3 rainDirection);
-
 
 
 };

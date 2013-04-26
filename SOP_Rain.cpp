@@ -159,16 +159,23 @@ RainData::RainData()
     printf("RainData default constructor\n");
 }
 
-RainData::RainData( long n, fpreal* bmin, fpreal* bmax, UT_Matrix3 dir,
-                    fpreal rndMin, fpreal rndMax, int seed)
+RainData::RainData( fpreal now,
+                    long n, UT_Vector3 bmin, UT_Vector3 bmax, UT_Vector3 dir,
+                    fpreal rndMin, fpreal rndMax, int seed, fpreal speed,
+                    fpreal speedVarience)
 {
+    now_ = now;
     pointsNumber_ = n;
     minimumBounds_ = bmin;
     maximumBounds_ = bmax;
     rainDirection_ = dir;
+    directionMatrix_ = computeRotationMatrix(rainDirection_);
     rndMin_ = rndMin;
     rndMax_ = rndMax;
     seed_ = seed;
+    constantSpeed_ = speed;
+    speedVarience_ = speedVarience;
+
     noise_.initNoise();
 
 
@@ -183,20 +190,15 @@ RainData::~RainData()
 }
 
 
-class PerformParallelCalculations
-{
-private:
-    RainData* pRain_;
-
-public:
-    void operator() (const tbb::blocked_range<long>& r) const
+void PerformParallelCalculations::operator()
+    (const tbb::blocked_range<long>& r) const
     {   
         bool placed;
         fpreal noiseValue;
         fpreal dice = 1.0;
 
         UT_Vector3  p, pSeed;
-
+        UT_Matrix3 directionMatrix;
         for(long i=r.begin(); i != r.end(); ++i)
         {
             placed = false;
@@ -217,7 +219,7 @@ public:
                         (pRain_->maximumBounds_[2]-pRain_->minimumBounds_[2]) + 
                         pRain_->minimumBounds_[2];
 
-                pSeed = rowVecMult( p, pRain_->rainDirection_ );
+                pSeed = rowVecMult( p, pRain_->directionMatrix_ );
                 pSeed[1] = 0;
 
                 float pTmp[3];  //TODO: Noise frequence and offset parms
@@ -235,12 +237,9 @@ public:
         }
     }
 
-    PerformParallelCalculations(RainData* rain) :
-        pRain_(rain)
-    {};
-
-};
-
+PerformParallelCalculations::PerformParallelCalculations(RainData* rain) :
+    pRain_(rain)
+{};
 
 
 void RainData::computeInitialPositions()
@@ -248,14 +247,68 @@ void RainData::computeInitialPositions()
     printf( "...Generating Initial Position for %li...\n", pointsNumber_ );
     tbb::parallel_for(  tbb::blocked_range<long>( 0, pointsNumber_ ),
                         PerformParallelCalculations(this) );
-    // for (int i = 0; i < pointsNumber_; ++i)
-    // {
-    //     pointInitialPositions_[i] = UT_Vector3(0,0,0);
-    // }
-
 }
 
-UT_Matrix3 SOP_Rain::computeRotationMatrix(UT_Vector3 rainDirection)
+
+void RainData::getShiftedPosition(  GU_Detail* gdp,
+                                    GU_PrimParticle* particleSystem)
+    {
+        int pointIndex;
+        fpreal actualSpeed;
+        fpreal parm1x,parm2x,parm1y,parm2y,parm1z,parm2z, parmInitial;
+        UT_Vector3 p1x, p2x, p1y, p2y, p1z, p2z, p1, p2, initialPosition, p;
+        fpreal pathLength, pathPeriod;
+        fpreal integralPart;
+        const UT_Vector3* boundPoints;
+
+
+        GA_Primitive::const_iterator it;
+        for(particleSystem->beginVertex(it); it.atEnd() == 0; ++it)
+            {   
+                pointIndex = it.getPointOffset();
+                actualSpeed =   constantSpeed_ +
+                                constantSpeed_ * speedVarience_ *
+                                ((float)rndGenerator_.nexti() / 0xffffffff
+                                 - 0.5) * 2;
+                                
+                initialPosition = getInitialPosition(pointIndex);
+                
+                parm1x =    (maximumBounds_[0] - initialPosition[0]) / 
+                             rainDirection_[0];
+                parm2x =    (minimumBounds_[0] - initialPosition[0]) / 
+                             rainDirection_[0];
+                parm1y =    (maximumBounds_[1] - initialPosition[1]) / 
+                             rainDirection_[1];
+                parm2y =    (minimumBounds_[1] - initialPosition[1]) / 
+                             rainDirection_[1];
+                parm1z =    (maximumBounds_[2] - initialPosition[2]) / 
+                             rainDirection_[2];
+                parm2z =    (minimumBounds_[2] - initialPosition[2]) / 
+                             rainDirection_[2];
+                p1x = initialPosition + parm1x*rainDirection_;
+                p2x = initialPosition + parm2x*rainDirection_; 
+                p1y = initialPosition + parm1y*rainDirection_;
+                p2y = initialPosition + parm2y*rainDirection_;
+                p1z = initialPosition + parm1z*rainDirection_;
+                p2z = initialPosition + parm2z*rainDirection_;                                
+                UT_Vector3 endsArray [6] = {p1x, p2x, p1y, p2y, p1z, p2z};
+                boundPoints = getInboundPoints(endsArray);
+
+                pathLength = (boundPoints[0] - boundPoints[1]).length();
+                pathPeriod = pathLength / actualSpeed;
+                parmInitial =   (initialPosition - boundPoints[0]).length() / 
+                                pathLength;
+                integralPart = parmInitial + now_ / pathPeriod;
+                
+                p = boundPoints[0] +
+                    (integralPart - (int)integralPart) * 
+                    (boundPoints[1] - boundPoints[0]);
+                
+                gdp->setPos3(pointIndex, p);
+            }
+    }
+
+UT_Matrix3 RainData::computeRotationMatrix(UT_Vector3 rainDirection)
 {
     static const UT_Vector3 up(0.0, -1.0, 0.0);
     UT_Matrix3 rotDirMatrix(1.0);
@@ -310,29 +363,25 @@ SOP_Rain::cookMySop(OP_Context &context)
         boss->opStart("Start generating rain");
 
         gdp->clearAndDestroy();
-
+        
         fpreal now = TIME(context.getTime());
-        long nPoints = NPOINTS(now);
-        int seed = SEED(now);
-        fpreal constantSpeed = SPEED (now);
-        fpreal speedVarience = SPEEDVARIENCE (now);
-        fpreal *bmax, *bmin;
-        bmax = BOUNDMAX (now);
-        bmin = BOUNDMIN (now);
+        long nPoints = NPOINTS( now );
         UT_Vector3 rainDirection = RAINDIRECTION(now);
         rainDirection.normalize();
-            
+
             //CLOCK
         // clock_t start, end;
         // start = clock();
-        RainData rain(  nPoints, bmin, bmax,
-                        computeRotationMatrix(rainDirection), 
-                        DICEMIN(now), DICEMAX(now), seed);
-
+        RainData rain(  now,
+                        nPoints, BOUNDMIN (now), BOUNDMAX (now),
+                        rainDirection, 
+                        DICEMIN(now), DICEMAX(now), SEED(now),
+                        SPEED (now),
+                        SPEEDVARIENCE (now));
 
         if(rain.getAllocationState() == false || isPointsNumberChanged_ == true)
         {
-            rain.allocate(NPOINTS(now));
+            rain.allocate(nPoints);
         }
         if( rain.getAllocationState() == true && 
             ( rain.getCachedState() == false || isParameterChanged_ == true ) )
@@ -340,7 +389,6 @@ SOP_Rain::cookMySop(OP_Context &context)
             rain.computeInitialPositions();
             rain.setCachedState(true);      
         }
-        
         // end = clock();
         // printf("positioning: %f\n", (double)(end-start)/CLOCKS_PER_SEC);
             //CLOCK END
@@ -348,62 +396,9 @@ SOP_Rain::cookMySop(OP_Context &context)
         GU_PrimParticle* partsys;
         if (partsys = GU_PrimParticle::build(gdp, nPoints))
         {
-            int pointIndex;
-            fpreal actualSpeed;
-            fpreal parm1x,parm2x,parm1y,parm2y,parm1z,parm2z, parmInitial;
-            UT_Vector3 p1x, p2x, p1y, p2y, p1z, p2z, p1, p2, initialPosition, p;
-            fpreal pathLength, pathPeriod;
-            fpreal integralPart;
-            const UT_Vector3* boundPoints;
-            Imath::Rand32 randomGenerator(seed);
-
-            GA_Primitive::const_iterator it;
-            
-            // //CLOCK
-            // start = clock();
-            for(partsys->beginVertex(it); it.atEnd() == 0; ++it)
-            {   pointIndex = it.getPointOffset();
-                actualSpeed =   constantSpeed +
-                                constantSpeed * speedVarience *
-                                ((float)randomGenerator.nexti() / 0xffffffff
-                                 - 0.5) * 2;
-
-                initialPosition = rain.getInitialPosition(pointIndex);
-
-                parm1x = (bmax[0] - initialPosition[0])/rainDirection[0];
-                parm2x = (bmin[0] - initialPosition[0])/rainDirection[0];
-                parm1y = (bmax[1] - initialPosition[1])/rainDirection[1];
-                parm2y = (bmin[1] - initialPosition[1])/rainDirection[1];
-                parm1z = (bmax[2] - initialPosition[2])/rainDirection[2];
-                parm2z = (bmin[2] - initialPosition[2])/rainDirection[2];
-                p1x = initialPosition + parm1x*rainDirection;
-                p2x = initialPosition + parm2x*rainDirection; 
-                p1y = initialPosition + parm1y*rainDirection;
-                p2y = initialPosition + parm2y*rainDirection;
-                p1z = initialPosition + parm1z*rainDirection;
-                p2z = initialPosition + parm2z*rainDirection;
-
-                UT_Vector3 endsArray [6] = {p1x, p2x, p1y, p2y, p1z, p2z};
-                boundPoints = rain.getInboundPoints(endsArray);
-
-                pathLength = (boundPoints[0] - boundPoints[1]).length();
-                pathPeriod = pathLength / actualSpeed;
-                parmInitial =   (initialPosition - boundPoints[0]).length() / 
-                                pathLength;
-                integralPart = parmInitial + now / pathPeriod;
-                
-                p = boundPoints[0] +
-                    (integralPart - (int)integralPart) * 
-                    (boundPoints[1] - boundPoints[0]);
-
-                gdp->setPos3(pointIndex, p);
-
-            }
-
-            // end = clock();
-            // printf("For loop: %f\n", (double)(end-start)/CLOCKS_PER_SEC);
-            //CLOCK END
+            rain.getShiftedPosition(gdp, partsys);
         }
+
         boss->opEnd();
     }
     isParameterChanged_ = false;
