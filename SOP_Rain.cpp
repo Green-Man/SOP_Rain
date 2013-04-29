@@ -12,6 +12,7 @@
 #include <tbb/tbb.h>
 
 
+
 #include "SOP_Rain.h"
 #include "Rain.h"
 
@@ -118,6 +119,7 @@ PRM_Template SOP_Rain::myTemplateList[] = {
 
 bool SOP_Rain::isParameterChanged_ = true;
 bool SOP_Rain::isPointsNumberChanged_ = true;
+bool SOP_Rain::isPointsGenerated_ = false;
 int SOP_Rain::parmChanged(void * data, int,  float, const PRM_Template *)
 {
   isParameterChanged_ = true;
@@ -127,6 +129,7 @@ int SOP_Rain::parmChanged(void * data, int,  float, const PRM_Template *)
                                     const PRM_Template *)
 {
   isPointsNumberChanged_ = true;
+  isPointsGenerated_ = false;
   return 1;
  }
 
@@ -134,7 +137,7 @@ OP_Node* SOP_Rain::myConstructor(   OP_Network *net, const char *name,
                                     OP_Operator *op)
 {
     return new SOP_Rain(net, name, op);
-    printf("SOP_Rain myconstructor...\n");
+    //printf("SOP_Rain myconstructor...\n");
 }
 
 SOP_Rain::SOP_Rain(OP_Network *net, const char *name, OP_Operator *op)
@@ -148,6 +151,20 @@ SOP_Rain::~SOP_Rain()
     rain.makeFree();
 }
 
+void SOP_Rain::generatePoints(GU_Detail* gdp, long n)
+{
+    //printf("Generate points\n");
+    GU_PrimParticle* partsys;
+    if (partsys = GU_PrimParticle::build(gdp, n))
+    {
+        GA_Primitive::const_iterator it;  
+        for(partsys->beginVertex(it); it.atEnd() == 0; ++it)
+        {
+            //gdp->setPos3(it.getPointOffset(), UT_Vector3(0,0,0));
+        }
+    }
+}
+
 //==== Iinitialization of RainData static members ====
 bool RainData::isInitialPositionAllocated_ = false;
 bool RainData::isInitialPositionCached_ = false;
@@ -156,7 +173,7 @@ UT_Vector3* RainData::pointInitialPositions_;
 
 RainData::RainData()
 {
-    printf("RainData default constructor\n");
+    //printf("RainData default constructor\n");
 }
 
 RainData::RainData( fpreal now,
@@ -190,7 +207,7 @@ RainData::~RainData()
 }
 
 
-void PerformParallelCalculations::operator()
+void ParallelInitialPositions::operator()
     (const tbb::blocked_range<long>& r) const
     {   
         bool placed;
@@ -237,76 +254,137 @@ void PerformParallelCalculations::operator()
         }
     }
 
-PerformParallelCalculations::PerformParallelCalculations(RainData* rain) :
+ParallelInitialPositions::ParallelInitialPositions(RainData* rain) :
     pRain_(rain)
 {};
-
 
 void RainData::computeInitialPositions()
 {
     printf( "...Generating Initial Position for %li...\n", pointsNumber_ );
     tbb::parallel_for(  tbb::blocked_range<long>( 0, pointsNumber_ ),
-                        PerformParallelCalculations(this) );
+                        ParallelInitialPositions(this) );
 }
 
-
-void RainData::getShiftedPosition(  GU_Detail* gdp,
-                                    GU_PrimParticle* particleSystem)
+void ParallelShift::operator()(const GA_SplittableRange &r) const
     {
-        int pointIndex;
         fpreal actualSpeed;
         fpreal parm1x,parm2x,parm1y,parm2y,parm1z,parm2z, parmInitial;
         UT_Vector3 p1x, p2x, p1y, p2y, p1z, p2z, p1, p2, initialPosition, p;
         fpreal pathLength, pathPeriod;
         fpreal integralPart;
-        const UT_Vector3* boundPoints;
+        UT_Vector3 boundPoints[2];
 
+        for(GA_PageIterator pit = r.beginPages(); !pit.atEnd(); ++pit)
+        {
+            GA_Offset       start, end;
+            for (GA_Iterator it(pit.begin()); it.blockAdvance(start, end); )
+            {
+                for (GA_Offset i = start; i < end; ++i)
+                {
+                    actualSpeed =   pRain_->constantSpeed_ +
+                                   pRain_->constantSpeed_ * pRain_->speedVarience_ *
+                                   ((float)pRain_->rndGenerator_.nexti() / 0xffffffff
+                                    - 0.5) * 2;
 
-        GA_Primitive::const_iterator it;
-        for(particleSystem->beginVertex(it); it.atEnd() == 0; ++it)
-            {   
-                pointIndex = it.getPointOffset();
-                actualSpeed =   constantSpeed_ +
-                                constantSpeed_ * speedVarience_ *
-                                ((float)rndGenerator_.nexti() / 0xffffffff
-                                 - 0.5) * 2;
-                                
-                initialPosition = getInitialPosition(pointIndex);
-                
-                parm1x =    (maximumBounds_[0] - initialPosition[0]) / 
-                             rainDirection_[0];
-                parm2x =    (minimumBounds_[0] - initialPosition[0]) / 
-                             rainDirection_[0];
-                parm1y =    (maximumBounds_[1] - initialPosition[1]) / 
-                             rainDirection_[1];
-                parm2y =    (minimumBounds_[1] - initialPosition[1]) / 
-                             rainDirection_[1];
-                parm1z =    (maximumBounds_[2] - initialPosition[2]) / 
-                             rainDirection_[2];
-                parm2z =    (minimumBounds_[2] - initialPosition[2]) / 
-                             rainDirection_[2];
-                p1x = initialPosition + parm1x*rainDirection_;
-                p2x = initialPosition + parm2x*rainDirection_; 
-                p1y = initialPosition + parm1y*rainDirection_;
-                p2y = initialPosition + parm2y*rainDirection_;
-                p1z = initialPosition + parm1z*rainDirection_;
-                p2z = initialPosition + parm2z*rainDirection_;                                
-                UT_Vector3 endsArray [6] = {p1x, p2x, p1y, p2y, p1z, p2z};
-                boundPoints = getInboundPoints(endsArray);
+                    initialPosition = pRain_->getInitialPosition(i);
 
-                pathLength = (boundPoints[0] - boundPoints[1]).length();
-                pathPeriod = pathLength / actualSpeed;
-                parmInitial =   (initialPosition - boundPoints[0]).length() / 
-                                pathLength;
-                integralPart = parmInitial + now_ / pathPeriod;
-                
-                p = boundPoints[0] +
-                    (integralPart - (int)integralPart) * 
-                    (boundPoints[1] - boundPoints[0]);
-                
-                gdp->setPos3(pointIndex, p);
-            }
+                    parm1x = (pRain_->maximumBounds_[0] - initialPosition[0]) / 
+                             pRain_->rainDirection_[0];
+                    parm2x = (pRain_->minimumBounds_[0] - initialPosition[0]) / 
+                             pRain_->rainDirection_[0];
+                    parm1y = (pRain_->maximumBounds_[1] - initialPosition[1]) / 
+                             pRain_->rainDirection_[1];
+                    parm2y = (pRain_->minimumBounds_[1] - initialPosition[1]) / 
+                             pRain_->rainDirection_[1];
+                    parm1z = (pRain_->maximumBounds_[2] - initialPosition[2]) / 
+                             pRain_->rainDirection_[2];
+                    parm2z = (pRain_->minimumBounds_[2] - initialPosition[2]) / 
+                             pRain_->rainDirection_[2];
+                    p1x = initialPosition + parm1x*pRain_->rainDirection_;
+                    p2x = initialPosition + parm2x*pRain_->rainDirection_; 
+                    p1y = initialPosition + parm1y*pRain_->rainDirection_;
+                    p2y = initialPosition + parm2y*pRain_->rainDirection_;
+                    p1z = initialPosition + parm1z*pRain_->rainDirection_;
+                    p2z = initialPosition + parm2z*pRain_->rainDirection_; 
+                    
+                    UT_Vector3 endsArray [6] = {p1x, p2x, p1y, p2y, p1z, p2z};
+
+                    if(true)
+                    { 
+                        UT_Vector3 tmpPoint;  
+                        bool inBound; 
+                        int endsFound = 0;
+                        int k = 0;
+                        while(k<6 && endsFound <2)
+                        {   
+                            inBound = false;        
+                            inBound =   (endsArray[k][0] >= pRain_->minimumBounds_[0]) &&
+                                        (endsArray[k][1] >= pRain_->minimumBounds_[1]) &&
+                                        (endsArray[k][2] >= pRain_->minimumBounds_[2]) &&
+                                        (endsArray[k][0] <= pRain_->maximumBounds_[0]) &&
+                                        (endsArray[k][1] <= pRain_->maximumBounds_[1]) &&
+                                        (endsArray[k][2] <= pRain_->maximumBounds_[2]);
+                            if (inBound == true)
+                            {
+                                boundPoints[endsFound] = endsArray[k];
+                                endsFound++;
+                            }         
+                            k++;
+                        }
+                        if (boundPoints[0][1]<boundPoints[1][1])
+                        {
+                            tmpPoint = boundPoints[1];
+                            boundPoints[1] = boundPoints[0];
+                            boundPoints[0] = tmpPoint;
+                        } 
+                    }
+
+                    // for (int j = 0; j < 2; ++j)
+                    // {   
+                    //     for (int k = 0; k < 3; ++k)
+                    //     {
+                    //         printf("%f ",  boundPoints[j][k] );
+                    //     }
+                    //     printf("\n");
+                    // }
+                    // printf("===============\n");
+
+                    pathLength = (boundPoints[0] - boundPoints[1]).length();
+                    pathPeriod = pathLength / actualSpeed;
+                    parmInitial =   (initialPosition - boundPoints[0]).length() / 
+                                    pathLength;
+                    integralPart = parmInitial + pRain_->now_ / pathPeriod;                   
+
+                    p = boundPoints[0] +
+                        (integralPart - (int)integralPart) * 
+                        (boundPoints[1] - boundPoints[0]);
+                    //p = boundPoints[0];
+                    // if (i == 1000)
+                    // {
+                    //     printf("%f %f %f\n", boundPoints[0][0],
+                    //                          boundPoints[0][1],
+                    //                          boundPoints[0][2]);
+                    // }
+                    
+                    gdp_->setPos3(i, p);
+                }                  
+            }           
+        } 
     }
+
+
+void RainData::shiftPositions(  GU_Detail* gdp, const GA_Range &range )
+    {
+        // tbb::parallel_for(  tbb::blocked_range<long>( 0, pointsNumber_ ),
+        //                     ParallelShift( this, gdp ) );
+        UTparallelFor(GA_SplittableRange(range), ParallelShift( this, gdp ));
+    }
+
+ParallelShift::ParallelShift(   RainData* rain,
+                                GU_Detail* gdp) :
+    pRain_(rain),
+    gdp_(gdp)
+{};
 
 UT_Matrix3 RainData::computeRotationMatrix(UT_Vector3 rainDirection)
 {
@@ -322,52 +400,22 @@ UT_Matrix3 RainData::computeRotationMatrix(UT_Vector3 rainDirection)
     return rotDirMatrix;
 }
 
-const UT_Vector3* RainData::getInboundPoints( UT_Vector3* points)
-{   
-    static UT_Vector3 pointPair[2];  
-    bool inBound; 
-    int endsFound = 0;
-    int i = 0;
-    while(i<6 && endsFound <2)
-    {   
-        inBound = false;        
-        inBound =   (points[i][0] >= minimumBounds_[0]) &&
-                    (points[i][1] >= minimumBounds_[1]) &&
-                    (points[i][2] >= minimumBounds_[2]) &&
-                    (points[i][0] <= maximumBounds_[0]) &&
-                    (points[i][1] <= maximumBounds_[1]) &&
-                    (points[i][2] <= maximumBounds_[2]);
-        if (inBound == true)
-        {
-            pointPair[endsFound] = points[i];
-            endsFound++;
-        }         
-        i++;
-    }
-    if (pointPair[0][1]<pointPair[1][1])
-    {
-        UT_Vector3 tmpPoint = pointPair[1];
-        pointPair[1] = pointPair[0];
-        pointPair[0] = tmpPoint;
-    }
-    return pointPair;
-}
 
 OP_ERROR
 SOP_Rain::cookMySop(OP_Context &context)
 {
-    UT_Interrupt    *boss;
+    //UT_Interrupt    *boss;
     if (error() < UT_ERROR_ABORT)
     {
-        boss = UTgetInterrupt();
-        boss->opStart("Start generating rain");
+        //boss = UTgetInterrupt();
+        //boss->opStart("Start generating rain");
 
-        gdp->clearAndDestroy();
+        
         
         fpreal now = TIME(context.getTime());
         long nPoints = NPOINTS( now );
         UT_Vector3 rainDirection = RAINDIRECTION(now);
-        rainDirection.normalize();
+        //rainDirection.normalize(); //TODO: check for (0,0,0) vector
 
             //CLOCK
         // clock_t start, end;
@@ -387,19 +435,31 @@ SOP_Rain::cookMySop(OP_Context &context)
             ( rain.getCachedState() == false || isParameterChanged_ == true ) )
         {   
             rain.computeInitialPositions();
-            rain.setCachedState(true);      
+            rain.setCachedState(true);     
         }
         // end = clock();
         // printf("positioning: %f\n", (double)(end-start)/CLOCKS_PER_SEC);
             //CLOCK END
-
-        GU_PrimParticle* partsys;
-        if (partsys = GU_PrimParticle::build(gdp, nPoints))
+        if (isPointsGenerated_ == false)
         {
-            rain.getShiftedPosition(gdp, partsys);
-        }
+            gdp->clearAndDestroy();
 
-        boss->opEnd();
+            generatePoints(gdp, nPoints);
+            isPointsGenerated_ = true;
+        }
+        
+
+        for (   GA_Iterator pr_it(gdp->getPrimitiveRange());
+                !pr_it.atEnd();
+                ++pr_it)
+        {
+            GEO_Primitive* prim = gdp->getGEOPrimitive(*pr_it);
+            GA_Range range = prim->getPointRange();
+            rain.shiftPositions( gdp, range);            
+        }
+     
+
+        //boss->opEnd();
     }
     isParameterChanged_ = false;
     isPointsNumberChanged_ = false;

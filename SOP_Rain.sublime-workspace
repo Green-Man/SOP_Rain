@@ -4,16 +4,108 @@
 		"selected_items":
 		[
 			[
+				"end",
+				"endsArray"
+			],
+			[
+				"poi",
+				"pointInitialPositions_"
+			],
+			[
+				"rai",
+				"rainDirection_"
+			],
+			[
+				"Para",
+				"ParallelShift"
+			],
+			[
+				"set",
+				"setPos3"
+			],
+			[
+				"gener",
+				"generatePoints"
+			],
+			[
 				"UT",
 				"UT_Vector3"
 			],
 			[
-				"thr",
-				"threadIndex"
+				"parti",
+				"particleSystem"
+			],
+			[
+				"di",
+				"directionMatrix"
+			],
+			[
+				"rain",
+				"rainDirection_"
+			],
+			[
+				"Var",
+				"speedVarience_"
+			],
+			[
+				"getIn",
+				"getInitialPosition"
+			],
+			[
+				"noi",
+				"noiseValue"
+			],
+			[
+				"UT_Noise",
+				"UT_NoiseType"
+			],
+			[
+				"U",
+				"UT_Noise"
+			],
+			[
+				"ini",
+				"initialize"
+			],
+			[
+				"noise",
+				"noise_"
+			],
+			[
+				"IM",
+				"ImathRandom"
+			],
+			[
+				"parallel",
+				"parallelRain"
+			],
+			[
+				"rn",
+				"rndGenerator"
+			],
+			[
+				"see",
+				"seed_"
+			],
+			[
+				"rnd",
+				"rndGenerator"
+			],
+			[
+				"po",
+				"pointsNumber_"
+			],
+			[
+				"C",
+				"CXXFLAGS"
 			],
 			[
 				"poin",
-				"pointsNumber_"
+				"pointInitialPositions_"
+			],
+			[
+				"thr",
+				"threadIndex"
 			],
 			[
 				"COmpute",
@@ -36,10 +128,6 @@
 				"pointIndex"
 			],
 			[
-				"po",
-				"pointsNumberChanged"
-			],
-			[
 				"is",
 				"isInitialPositionCached_"
 			],
@@ -56,16 +144,8 @@
 				"NPOINTS"
 			],
 			[
-				"rain",
-				"rainDirection"
-			],
-			[
 				"rainDirectionVe",
 				"rainDirectionVector"
-			],
-			[
-				"rai",
-				"rainDirection"
 			],
 			[
 				"get",
@@ -84,32 +164,16 @@
 				"minimumBounds_"
 			],
 			[
-				"poi",
-				"pointInitialPositions_"
-			],
-			[
 				"dc",
 				"diceMax"
-			],
-			[
-				"di",
-				"diceMin"
 			],
 			[
 				"rot",
 				"rotDirMatrix"
 			],
 			[
-				"rnd",
-				"rndMax"
-			],
-			[
 				"rndM",
 				"rndMax_"
-			],
-			[
-				"rn",
-				"rndMin_"
 			],
 			[
 				"nois",
@@ -124,24 +188,12 @@
 				"minimumBounds_"
 			],
 			[
-				"getIn",
-				"getInitialPosition_"
-			],
-			[
 				"max",
 				"maximumBounds"
 			],
 			[
-				"set",
-				"setCachedState"
-			],
-			[
 				"Rain",
 				"RainData"
-			],
-			[
-				"end",
-				"endsFound"
 			],
 			[
 				"en",
@@ -462,58 +514,6 @@
 			[
 				"pix",
 				"pixels"
-			],
-			[
-				"cur",
-				"curtvec"
-			],
-			[
-				"lig",
-				"lightposn"
-			],
-			[
-				"GL",
-				"GLfloat"
-			],
-			[
-				"va",
-				"valuesM"
-			],
-			[
-				"mypos",
-				"myposition"
-			],
-			[
-				"size",
-				"sizeof"
-			],
-			[
-				"tran",
-				"transfstack"
-			],
-			[
-				"transf",
-				"transform"
-			],
-			[
-				"obj",
-				"objtr"
-			],
-			[
-				"val",
-				"values"
-			],
-			[
-				"up",
-				"upinit"
-			],
-			[
-				"zF",
-				"zFar"
-			],
-			[
-				"z",
-				"zNear"
 			]
 		]
 	},
@@ -523,15 +523,7 @@
 			"file": "SOP_Rain.cpp",
 			"settings":
 			{
-				"buffer_size": 14551,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "SOP_Rain.h",
-			"settings":
-			{
-				"buffer_size": 1957,
+				"buffer_size": 17324,
 				"line_ending": "Unix"
 			}
 		},
@@ -539,31 +531,15 @@
 			"file": "Rain.h",
 			"settings":
 			{
-				"buffer_size": 1763,
+				"buffer_size": 2321,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/green/src/hot/SOP_Ocean.C",
+			"file": "SOP_Rain.h",
 			"settings":
 			{
-				"buffer_size": 16231,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/green/src/hot/Ocean.h",
-			"settings":
-			{
-				"buffer_size": 20982,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/green/src/hot/SOP_Ocean.h",
-			"settings":
-			{
-				"buffer_size": 3236,
+				"buffer_size": 1944,
 				"line_ending": "Unix"
 			}
 		}
@@ -571,9 +547,37 @@
 	"build_system": "Packages/Makefile/Make.sublime-build",
 	"command_palette":
 	{
-		"height": 392.0,
+		"height": 138.0,
 		"selected_items":
 		[
+			[
+				"for",
+				"Snippet: For Loop"
+			],
+			[
+				"if",
+				"Snippet: If Condition"
+			],
+			[
+				"print",
+				"Snippet: printf …"
+			],
+			[
+				"pri",
+				"Snippet: printf …"
+			],
+			[
+				"pr",
+				"Snippet: printf …"
+			],
+			[
+				"c++",
+				"Set Syntax: C++"
+			],
+			[
+				"prin",
+				"Snippet: printf …"
+			],
 			[
 				"c",
 				"Set Syntax: C"
@@ -587,24 +591,8 @@
 				"Snippet: #include <…>"
 			],
 			[
-				"if",
-				"Snippet: If Condition"
-			],
-			[
 				"cla",
 				"Snippet: class-..-(class)"
-			],
-			[
-				"for",
-				"Snippet: For Loop"
-			],
-			[
-				"prin",
-				"Snippet: printf …"
-			],
-			[
-				"print",
-				"Snippet: printf …"
 			],
 			[
 				"fo",
@@ -613,14 +601,6 @@
 			[
 				"class",
 				"Snippet: class-..-(class)"
-			],
-			[
-				"pri",
-				"Snippet: printf …"
-			],
-			[
-				"pr",
-				"Snippet: printf …"
 			],
 			[
 				"ins",
@@ -653,10 +633,6 @@
 			[
 				"pyth",
 				"Set Syntax: Python"
-			],
-			[
-				"c++",
-				"Set Syntax: C++"
 			],
 			[
 				"pyt",
@@ -711,7 +687,7 @@
 				"Snippet: If Condition"
 			]
 		],
-		"width": 575.0
+		"width": 404.0
 	},
 	"console":
 	{
@@ -728,13 +704,70 @@
 	},
 	"file_history":
 	[
+		"/home/green/.bashrc",
+		"/etc/udev/rules.d/README",
+		"/home/green/src/SOP_Rain/SOP_Rain.cpp",
+		"/home/green/src/SOP_Rain_repository/Rain.h",
+		"/home/green/src/SOP_Rain_repository/SOP_Rain.h",
+		"/home/green/src/SOP_Rain/SOP_Rain.h",
+		"/home/green/src/SOP_Rain_repository/SOP_Rain.cpp",
+		"/home/green/src/SOP_Rain/Rain.h",
+		"/home/green/src/SOP_Rain_repository/.git/HEAD",
+		"/home/green/src/SOP_Rain_repository/.git/hooks/pre-commit.sample",
+		"/home/green/src/SOP_Rain/SOP_Rain.sublime-workspace",
+		"/tmp/hfs31877-0.tmp",
+		"/tmp/crash.sop_rain.green_32081.hip",
+		"/home/green/src/SOP_Rain/bkp/SOP_Rain.v06.cpp",
+		"/home/green/src/SOP_Rain/bkp/SOP_Rain.v05.cpp",
+		"/home/green/src/SOP_Rain/bkp/v12/SOP_Rain.cpp",
+		"/home/green/src/SOP_Rain/bkp/SOP_Rain.v11.cpp",
+		"/opt/hfs12.5.316.22/toolkit/include/tbb/compat/thread",
+		"/opt/hfs12.5.316.22/toolkit/include/tbb/parallel_for.h",
+		"/home/green/src/SOP_Rain/Makefile",
+		"/home/green/.nuke/menu.py",
+		"/home/green/src/crwReader/Makefile",
+		"/home/green/src/crwReader/crwReader.cpp",
+		"/usr/local/Nuke7.0v4/Documentation/NDK/examples/crwReader.cpp",
+		"/home/green/Downloads/J_Ops/J_Ops_2.1v1_for_Nuke7.0v1b110_c64_Setup",
+		"/home/green/src/omp_test/omp_test.c",
+		"/home/green/src/hot_omp/src_cs_openMp_multithreading/SOP_Ocean.C",
+		"/home/green/src/hot_omp/src_cs_openMp_multithreading/Ocean.h",
+		"/home/green/src/hot_omp/src_cs_openMp_multithreading/SOP_Ocean.h",
+		"/home/green/src/hot_omp/src_cs_openMp_multithreading/Makefile",
+		"/home/green/src/hot_omp/hotsrc_1.0rc8/src/3rdparty/src/fftw-3.2.2/api/fftw3.f",
+		"/home/green/src/hot_omp/hotsrc_1.0rc8/src/3rdparty/src/fftw-3.2.2/api/fftw3.h",
+		"/home/green/src/hot_omp/hotsrc_1.0rc8/src/3rdparty/src/fftw-3.2.2/api/import-wisdom.c",
+		"/opt/hfs12.5.316.22/toolkit/samples/SIM/SIM_GasAdd.h",
+		"/opt/hfs12.5.316.22/toolkit/samples/SIM/SIM_GasAdd.C",
+		"/opt/hfs12.5.316.22/toolkit/makefiles/Makefile.linux",
+		"/opt/hfs12.5.316.22/toolkit/include/openmpi/ompi/mpi/cxx/info.h",
+		"/home/green/src/hot_omp/src_cs_openMp_multithreading/README.txt",
+		"/opt/hfs12.5.316.22/toolkit/makefiles/Makefile.gnu",
+		"/opt/hfs12.5.316.22/toolkit/makefiles/Makefile.nmake",
+		"/home/green/Downloads/hot_omp/hotsrc_1.0rc8/docs/_static/leave_me_here",
+		"/home/green/Downloads/hot_omp/hotsrc_1.0rc8/scripts/googlecode_upload.py",
+		"/home/green/Downloads/hot_omp/hotsrc_1.0rc8/CMakeLists.txt",
+		"/home/green/Downloads/hot_omp/hotsrc_1.0rc8/.hgtags",
+		"/home/green/Downloads/hot_omp/hotsrc_1.0rc8/.hgignore",
+		"/home/green/Downloads/hot_omp/hotsrc_1.0rc8/.hg_archival.txt",
+		"/home/green/Downloads/hot_omp/hotsrc_1.0rc8/README.txt",
+		"/home/green/Downloads/hot_omp/src_cs_openMp_multithreading/README.txt",
+		"/home/green/Downloads/hot_omp/src_cs_openMp_multithreading/Makefile",
+		"/opt/hfs12.5.316.22/toolkit/include/tbb/index.html",
+		"/opt/hfs12.5.316.22/toolkit/include/tbb/tbb.h",
+		"/home/green/src/hot/SOP_Ocean.h",
+		"/home/green/src/hot/Ocean.h",
+		"/home/green/src/hot/SOP_Ocean.C",
+		"/home/green/houdini12.5/vex/include/get.vfl",
+		"/home/green/houdini12.5/vex/include/get.h",
+		"/home/green/Downloads/inline.vfl",
+		"/home/green/Downloads/aurora.vfl",
 		"/home/green/soft/ufoai/ufoai-2.4-source/LICENSES",
 		"/home/green/soft/ufoai/ufoai-2.4-source/src/client/renderer/r_particle.c",
 		"/home/green/soft/ufoai/ufoai-2.4-source/Makefile",
 		"/home/green/soft/ufoai/ufoai-2.4-source/src/docs/pathfinding.odg",
 		"/home/green/soft/ufoai/ufoai-2.4-source/README",
 		"/home/green/Downloads/aurora.vfl.htm",
-		"/home/green/Downloads/aurora.vfl",
 		"/opt/hfs12.5.316.22/houdini/vex/include/prman.h",
 		"/home/green/Downloads/vexnotes.h.htm",
 		"/home/green/Downloads/disp_rope.vfl",
@@ -754,9 +787,6 @@
 		"/home/green/src/SOP_Rain/test.cpp",
 		"/opt/hfs12.5.316.22/toolkit/samples/SOP/SOP_PointWave.C",
 		"/opt/hfs12.5.316.22/toolkit/samples/SOP/SOP_Star.C",
-		"/home/green/src/SOP_Rain/Makefile",
-		"/home/green/src/SOP_Rain/Rain.h",
-		"/home/green/src/SOP_Rain/SOP_Rain.h",
 		"/home/green/src/SOP_Rain/bkp/SOP_Rain.v07.cpp",
 		"/home/green/src/SOP_Rain/bkp/SOP_Rain.v08.cpp",
 		"/opt/hfs12.5.316.22/toolkit/samples/SOP/SOP_PrimVOP.C",
@@ -771,7 +801,6 @@
 		"/home/green/.config/sublime-text-2/Packages/Makefile/Make.sublime-build",
 		"/home/green/.config/sublime-text-2/Packages/Makefile/Makefile.sublime-settings",
 		"/opt/hfs12.5.316.22/toolkit/samples/SOP/SOP_BrushHairLen.C",
-		"/home/green/src/hot/Ocean.h",
 		"/opt/hfs12.5.316.22/toolkit/samples/SOP/SOP_SParticle.C",
 		"/tmp/crash.sop_rain.green_13270_log.txt",
 		"/home/green/Documents/TUM/grading_system_ren.doc",
@@ -782,7 +811,6 @@
 		"/opt/hfs12.5.316.22/toolkit/include/UT/UT_RSA.h",
 		"/opt/hfs12.5.316.22/toolkit/include/UT/UT_RandomSequence.h",
 		"/home/green/.config/sublime-text-2/Packages/C++/Completion Rules.tmPreferences",
-		"/home/green/src/SOP_Rain/SOP_Rain.cpp",
 		"/home/green/src/edx/cs184.1x/hw3-linuxosx/myrays.cpp",
 		"/home/green/src/edx/cs184.1x/hw1-linuxosx/shaders.cpp",
 		"/home/green/src/edx/cs184.1x/hw1-linuxosx/Transform.cpp",
@@ -796,66 +824,14 @@
 		"/home/green/.config/sublime-text-2/Packages/User/run_xforms.sublime-build",
 		"/home/green/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
 		"/home/green/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
-		"/home/green/src/hot/SOP_Ocean.h",
-		"/home/green/src/hot/SOP_Ocean.C",
-		"/home/green/src/SOP_Rain/SOP_Rain.sublime-workspace",
 		"/opt/hfs12.5.316.22/toolkit/samples/SOP/SOP_Star.h",
 		"/home/green/src/openvdb_houdini/houdini/SOP_OpenVDB_Read.cc",
-		"/home/green/.bashrc",
-		"/opt/hfs12.5.316.22/toolkit/makefiles/Makefile.gnu",
 		"/home/green/src/edx/cs184.1x/hw3-linuxosx/Makefile",
 		"/home/green/src/SOP_Rain/Makefile.linux",
 		"/home/green/src/openvdb_houdini/Makefile",
-		"/opt/hfs12.5.316.22/toolkit/makefiles/Makefile.linux",
 		"/opt/hfs12.5.316.22/toolkit/samples/SOP/SOP_CPPWave.h",
 		"/home/green/Dropbox/houdini/ec2/micro.pem",
-		"/home/green/Documents/TUM/statement_corrected.odt",
-		"/home/green/src/edx/cs6.00x/balance.py",
-		"/home/green/src/edx/cs6.00x/bisection.py",
-		"/home/green/Downloads/epd_free-7.3-2-rh5-x86.sh",
-		"/etc/profile",
-		"/var/log/apt/history.log",
-		"/usr/local/Nuke7.0v4/include/Build/fnAssert.h",
-		"/home/green/src/ffmpegWriter/Makefile",
-		"/home/green/src/ffmpegWriter/ffmpegWriter.cpp",
-		"/home/green/src/ffmpeg/arch.mak",
-		"/home/green/src/ffmpeg/gitlog.txt",
-		"/usr/include/libavformat/avformat.h",
-		"/home/green/src/psdReader/Makefile",
-		"/home/green/src/cortex-7.7.2/vars",
-		"/usr/share/shutter/resources/system/upload_plugins/upload/Dropbox.pm",
-		"/home/green/Downloads/The Foundry - NUKE 7.0v4 Linux64/Crack/install-lnx.txt",
-		"/usr/local/Nuke7.0v4/Documentation/NDK/examples/ffmpegWriter.cpp",
-		"/home/green/Downloads/nuke7.0v4/GFXDomain.COM.txt",
-		"/home/green/Downloads/nuke7.0v4/iNFO.url",
-		"/home/green/Downloads/nuke7.0v4/Crack/xf_foundry.lic",
-		"/home/green/src/openvdb_houdini/houdini/Utils.h",
-		"/home/green/src/openvdb_houdini/houdini/Utils.cc",
-		"/home/green/src/openvdb_houdini/houdini/GU_PrimVDB.h",
-		"/home/green/src/openvdb_houdini/houdini/GU_PrimVDB.cc",
-		"/home/green/src/openvdb_houdini/houdini/GEO_PrimVDB.h",
-		"/home/green/src/openvdb_houdini/houdini/GEO_PrimVDB.cc",
-		"/home/green/src/openvdb/io/File.h",
-		"/home/green/src/openvdb/io/File.cc",
-		"/home/green/src/openvdb_houdini/houdini/UT_VDBUtils.h",
-		"/home/green/src/openvdb/io/Archive.h",
-		"/home/green/src/openvdb/io/GridDescriptor.h",
-		"/home/green/src/openvdb/INSTALL",
-		"/home/green/src/openvdb/Makefile",
-		"/home/green/src/openvdb/README",
-		"/usr/local/procedurals/cube/cube-1.py",
-		"/usr/local/procedurals/visualiser/visualiser-1.py",
-		"/usr/local/procedurals/cube/cube.py",
-		"/home/green/src/cortex-7.7.2/contrib/for_review/SkeletonPrimitive_DrD/py_SkeletonPrimitiveIO/exportSkeletonFromMaya.py",
-		"/home/green/src/cortex-7.7.2/contrib/IECoreHoudini/config/cmake/FindCortex.cmake",
-		"/home/green/src/cortex-7.7.2/config.log",
-		"/home/green/src/cortex-7.7.2/doc/config/Doxyfile",
-		"/usr/local/procedurals/read/read-1.py",
-		"/home/green/houdini12.1/toolbar/blank.shelf",
-		"/home/green/houdini12.1/toolbar/cortex.shelf",
-		"/home/green/houdini12.1/asset_store/users.json",
-		"/home/green/src/cortex-7.7.2/test/IECore/resultsPython.txt",
-		"/home/green/houdini12.1/scripts/python/IECore/ClassLoader.py"
+		"/home/green/Documents/TUM/statement_corrected.odt"
 	],
 	"find":
 	{
@@ -879,6 +855,87 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"[i]",
+			"i",
+			"pointPair",
+			"maxBounds",
+			"minBounds",
+			"points",
+			"pointPair",
+			"getInboundPoints",
+			"int ",
+			"parmChanged",
+			"int ",
+			"int",
+			"maximumBounds_",
+			"minimumBounds_",
+			"getInboundPoints",
+			"initialPosition",
+			"rainDi",
+			"rainD",
+			"shift",
+			"pointIndex",
+			"rndGenerator_",
+			"rando",
+			"generatePoints",
+			"allocate",
+			"getInboundPoints",
+			"    ",
+			"shiftPositions",
+			"ParallelShift",
+			"shiftPositions",
+			"isPointsNumberChanged_",
+			"pointsNumberChanged",
+			"fpreal*",
+			"BOUNDMAX",
+			"computeRotationMatrix",
+			"ra",
+			"r",
+			"rainDirection_",
+			"(",
+			"/",
+			"bmin",
+			"bmax",
+			"rainDirection",
+			"constantSpeed",
+			"noise_",
+			"noise",
+			"rainDirection_",
+			"noise_",
+			"rowVecMult",
+			"rndGenerator",
+			"0",
+			"maximumBounds_",
+			"pointInitialPositions_",
+			"0",
+			"posVector",
+			"pointInitialPositions_",
+			"p",
+			"pointInitialPositions_",
+			"this",
+			"computeInitialPositions",
+			"gen",
+			"rndGenerator",
+			"getInboundPoints",
+			"rndGenerator",
+			"foo",
+			"p",
+			"++i",
+			"openmp",
+			"omp",
+			"CXXFLAGS",
+			"flags",
+			"computeInitialPositions",
+			"GA",
+			"UT_VoxelArrayIteratorF",
+			"setPartialRange",
+			"computeInitialPositions",
+			"computeRotationMatrix",
+			"initialPosition",
+			"computeInitialPositions",
+			"computeInitialPositionsPartial",
+			"RainData",
+			"virtual",
 			"color",
 			"waterColor",
 			"st_3_S",
@@ -925,88 +982,7 @@
 			"pointInitialPositions_",
 			"printf",
 			"getInboundPoints",
-			"pointInitialPositions_",
-			".h",
-			"RainData",
-			"rain",
-			"pointInitialPositions_",
-			"rainDirection",
-			"boundMax",
-			"boundMin",
-			"getInboundPoints",
-			"getInitialPosition",
-			"computeInitialPositions_",
-			"computeInitialPositions",
-			"getInboundPoints_",
-			"pointNo",
-			"isInitialPositionCached_",
-			"NPOINTS",
-			"getInitialPosition",
-			"computeInitialPositions",
-			"noiseValue",
-			"rowVecMult",
-			"setCachedState",
-			"getInitialPosition",
-			"Bounds",
-			"boundMin",
-			"boundMax",
-			"_ocean",
-			": SOP_Ocean",
-			":SOP_Ocean",
-			"::SOP_Ocean",
-			"_ocean",
-			"newSopOperator",
-			"isGenerationNewPositionNedded_",
-			"generateInitialRain",
-			"parmChanged",
-			"_ocean_needs_rebuild",
-			"getInboundPoints_",
-			"getInboundPoints",
-			"oceanNeedsRebuild",
-			"oceanChanged",
-			"forceCompile",
-			"PRM_Callback",
-			"parmChanged",
-			"callback",
-			"oceanChanged",
-			"oceanNeedsRebuild",
-			"bmin",
-			"ends",
-			"[0]",
-			"[i]",
-			"i",
-			"ends",
-			"p",
-			"boundPoints",
-			"getInboundPoints",
-			"p",
-			"p2",
-			"p1",
-			"sortCubePoints",
-			"sortCube",
-			"distances",
-			"distance",
-			"position",
-			"myList",
-			"mysort",
-			"sort",
-			"newPos",
-			"DEBUG_PRINT",
-			"(CXXFLAGS)",
-			"sort",
-			")",
-			"length(",
-			"p",
-			"getInitialPosition_",
-			"float ",
-			"vector ",
-			"P",
-			"float ",
-			"nV",
-			"[y]",
-			"[x]",
-			".z",
-			".y"
+			"pointInitialPositions_"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1043,15 +1019,15 @@
 					"file": "SOP_Rain.cpp",
 					"settings":
 					{
-						"buffer_size": 14551,
+						"buffer_size": 17324,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								421,
-								421
+								13019,
+								13019
 							]
 						],
 						"settings":
@@ -1065,53 +1041,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 215.0,
+						"translation.y": 6176.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "SOP_Rain.h",
-					"settings":
-					{
-						"buffer_size": 1957,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1957,
-								1957
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
 					"file": "Rain.h",
 					"settings":
 					{
-						"buffer_size": 1763,
+						"buffer_size": 2321,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								376,
-								376
+								2179,
+								2179
 							]
 						],
 						"settings":
@@ -1122,94 +1070,39 @@
 							],
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"wrap_width": 80
+						},
+						"translation.x": 0.0,
+						"translation.y": 1425.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "SOP_Rain.h",
+					"settings":
+					{
+						"buffer_size": 1944,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								459,
+								459
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/home/green/src/hot/SOP_Ocean.C",
-					"settings":
-					{
-						"buffer_size": 16231,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								8026,
-								8026
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 5188.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/home/green/src/hot/Ocean.h",
-					"settings":
-					{
-						"buffer_size": 20982,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								20742,
-								20742
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1822.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "/home/green/src/hot/SOP_Ocean.h",
-					"settings":
-					{
-						"buffer_size": 3236,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1525,
-								1525
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1150.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1250,7 +1143,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 309.0
+		"height": 178.0
 	},
 	"replace":
 	{
@@ -1276,7 +1169,7 @@
 	"show_minimap": true,
 	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": true,
+	"side_bar_visible": false,
 	"side_bar_width": 150.0,
 	"status_bar_visible": true
 }

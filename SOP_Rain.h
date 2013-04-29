@@ -15,8 +15,10 @@ private:
     
     static bool isParameterChanged_;
     static bool isPointsNumberChanged_;
+    static bool isPointsGenerated_;
     static int parmChanged(void *,int,float,const PRM_Template *);
     static int pointsNumberChanged(void *,int,float,const PRM_Template *);
+    void generatePoints(GU_Detail* gdp, long n);
     fpreal  SPEED(float t)   { return evalFloat( 0, 0, t); }
     fpreal  FPS(float t)   { return evalFloat( 1, 0, t); }
     UT_Vector3 BOUNDMIN(float t)

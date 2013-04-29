@@ -1,7 +1,8 @@
 class RainData
 {
 friend class SOP_Rain;
-friend class PerformParallelCalculations;
+friend class ParallelInitialPositions;
+friend class ParallelShift;
 
 public:
     RainData();
@@ -48,9 +49,8 @@ public:
         return pointInitialPositions_[ i ];
     }
 
-    void getShiftedPosition(  GU_Detail* gdp,
-                                    GU_PrimParticle* particleSystem);
-    const UT_Vector3* getInboundPoints( UT_Vector3* points );
+    void shiftPositions( GU_Detail* gdp, const GA_Range &range );
+
 
 private:
     UT_Matrix3 computeRotationMatrix(UT_Vector3 rainDirection);
@@ -73,12 +73,23 @@ private:
 };
 
 
-class PerformParallelCalculations
+class ParallelInitialPositions
 {
 private:
     RainData* pRain_;
 public:
     void operator() (const tbb::blocked_range<long>& r) const;
-    PerformParallelCalculations(RainData* rain);
+    ParallelInitialPositions(RainData* rain);
+};
 
+class ParallelShift
+{
+private:
+    RainData* pRain_;
+    GU_Detail* gdp_;
+
+public:
+    void operator() (const GA_SplittableRange &r) const;
+    ParallelShift(  RainData* rain,
+                    GU_Detail* gdp );
 };
