@@ -31,6 +31,7 @@ public:
     }
     void allocate(long nPoints)
     {
+        actualSpeed_ = new fpreal[nPoints];
         pointInitialPositions_ = new UT_Vector3[nPoints];   //TODO: check for 
         setAllocationState( true );                         //proper deletion
         setCachedState( false );
@@ -38,6 +39,7 @@ public:
     }
     void makeFree()
     {
+        delete [] actualSpeed_;
         delete [] pointInitialPositions_;
         setAllocationState( false );
         printf( "pointInitialPositions_ deleted\n" );
@@ -47,6 +49,11 @@ public:
     UT_Vector3 getInitialPosition( long i )
     {
         return pointInitialPositions_[ i ];
+    }
+
+    fpreal getActualSpeed( long i )
+    {
+        return actualSpeed_[ i ];
     }
 
     void shiftPositions( GU_Detail* gdp, const GA_Range &range );
@@ -67,6 +74,7 @@ private:
 
     Imath::Rand32 rndGenerator_;
     static UT_Vector3* pointInitialPositions_;
+    static fpreal* actualSpeed_;
 
     static bool isInitialPositionCached_;
     static bool isInitialPositionAllocated_;

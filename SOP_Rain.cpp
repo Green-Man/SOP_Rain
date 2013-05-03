@@ -94,7 +94,8 @@ static PRM_Name         nameTime("time","Time");
 
 
 PRM_Template SOP_Rain::myTemplateList[] = {
-    PRM_Template(   PRM_FLT, 1, &nameSpeed, &defaultSpeed, 0, &rangeSpeed),
+    PRM_Template(   PRM_FLT, 1, &nameSpeed, &defaultSpeed, 0, &rangeSpeed,
+                    parmChanged ),
     PRM_Template(   PRM_FLT_E, 1, &nameFps, &defaultFps, 0, &rangeFps ),
     PRM_Template(   PRM_XYZ, 3, &nameBoundMin, defaultBoundMin,0,0,parmChanged),
     PRM_Template(   PRM_XYZ, 3, &nameBoundMax, defaultBoundMax,0,0,parmChanged),
@@ -107,9 +108,9 @@ PRM_Template SOP_Rain::myTemplateList[] = {
     PRM_Template(   PRM_FLT_E, 1, &nameDiceMax, &defaultDiceMax, 0, 
                     &rangeDiceMax, parmChanged ),
     PRM_Template(   PRM_DIRECTION, 3, &nameRainDirection, defaultRainDirection,
-                    0, 0, parmChanged),
+                    0, 0, parmChanged ),
     PRM_Template(   PRM_FLT, 1, &nameSpeedVarience, &defaultSpeedVarience,
-                    0, &rangeSpeedVarience ),
+                    0, &rangeSpeedVarience, parmChanged ),
     PRM_Template(   PRM_FLT, 1, &nameTime, &defaultTime, 0, &rangeTime),
     PRM_Template(),
 };
@@ -169,6 +170,7 @@ void SOP_Rain::generatePoints(GU_Detail* gdp, long n)
 bool RainData::isInitialPositionAllocated_ = false;
 bool RainData::isInitialPositionCached_ = false;
 UT_Vector3* RainData::pointInitialPositions_;
+fpreal* RainData::actualSpeed_;
 //====================================================
 
 RainData::RainData()
@@ -251,6 +253,12 @@ void ParallelInitialPositions::operator()
                     placed = true;
             };
             pRain_->pointInitialPositions_[i] = p;
+
+            pRain_->actualSpeed_[i] =   pRain_->constantSpeed_ +
+                           pRain_->constantSpeed_ * pRain_->speedVarience_ *
+                           ((float)pRain_->rndGenerator_.nexti() / 0xffffffff
+                            - 0.5) * 2;
+
         }
     }
 
@@ -281,11 +289,7 @@ void ParallelShift::operator()(const GA_SplittableRange &r) const
             {
                 for (GA_Offset i = start; i < end; ++i)
                 {
-                    actualSpeed =   pRain_->constantSpeed_ +
-                                   pRain_->constantSpeed_ * pRain_->speedVarience_ *
-                                   ((float)pRain_->rndGenerator_.nexti() / 0xffffffff
-                                    - 0.5) * 2;
-
+                    actualSpeed = pRain_->getActualSpeed(i);
                     initialPosition = pRain_->getInitialPosition(i);
 
                     parm1x = (pRain_->maximumBounds_[0] - initialPosition[0]) / 
@@ -309,45 +313,41 @@ void ParallelShift::operator()(const GA_SplittableRange &r) const
                     
                     UT_Vector3 endsArray [6] = {p1x, p2x, p1y, p2y, p1z, p2z};
 
-                    if(true)
-                    { 
-                        UT_Vector3 tmpPoint;  
-                        bool inBound; 
-                        int endsFound = 0;
-                        int k = 0;
-                        while(k<6 && endsFound <2)
-                        {   
-                            inBound = false;        
-                            inBound =   (endsArray[k][0] >= pRain_->minimumBounds_[0]) &&
-                                        (endsArray[k][1] >= pRain_->minimumBounds_[1]) &&
-                                        (endsArray[k][2] >= pRain_->minimumBounds_[2]) &&
-                                        (endsArray[k][0] <= pRain_->maximumBounds_[0]) &&
-                                        (endsArray[k][1] <= pRain_->maximumBounds_[1]) &&
-                                        (endsArray[k][2] <= pRain_->maximumBounds_[2]);
-                            if (inBound == true)
-                            {
-                                boundPoints[endsFound] = endsArray[k];
-                                endsFound++;
-                            }         
-                            k++;
-                        }
-                        if (boundPoints[0][1]<boundPoints[1][1])
+                    // ########### sort ########################################
+                    UT_Vector3 tmpPoint;  
+                    bool inBound; 
+                    int endsFound = 0;
+                    int k = 0;
+                    while(k<6 && endsFound <2)
+                    {   
+                        inBound = false;        
+                        inBound =   (endsArray[k][0] >= 
+                                                pRain_->minimumBounds_[0]) &&
+                                    (endsArray[k][1] >= 
+                                                pRain_->minimumBounds_[1]) &&
+                                    (endsArray[k][2] >= 
+                                                pRain_->minimumBounds_[2]) &&
+                                    (endsArray[k][0] <= 
+                                                pRain_->maximumBounds_[0]) &&
+                                    (endsArray[k][1] <= 
+                                                pRain_->maximumBounds_[1]) &&
+                                    (endsArray[k][2] <= 
+                                                pRain_->maximumBounds_[2]);
+                        if (inBound == true)
                         {
-                            tmpPoint = boundPoints[1];
-                            boundPoints[1] = boundPoints[0];
-                            boundPoints[0] = tmpPoint;
-                        } 
+                            boundPoints[endsFound] = endsArray[k];
+                            endsFound++;
+                        }         
+                        k++;
                     }
+                    if (boundPoints[0][1]<boundPoints[1][1])
+                    {
+                        tmpPoint = boundPoints[1];
+                        boundPoints[1] = boundPoints[0];
+                        boundPoints[0] = tmpPoint;
+                    }
+                    // E#############end of sort ###############################
 
-                    // for (int j = 0; j < 2; ++j)
-                    // {   
-                    //     for (int k = 0; k < 3; ++k)
-                    //     {
-                    //         printf("%f ",  boundPoints[j][k] );
-                    //     }
-                    //     printf("\n");
-                    // }
-                    // printf("===============\n");
 
                     pathLength = (boundPoints[0] - boundPoints[1]).length();
                     pathPeriod = pathLength / actualSpeed;
@@ -358,13 +358,6 @@ void ParallelShift::operator()(const GA_SplittableRange &r) const
                     p = boundPoints[0] +
                         (integralPart - (int)integralPart) * 
                         (boundPoints[1] - boundPoints[0]);
-                    //p = boundPoints[0];
-                    // if (i == 1000)
-                    // {
-                    //     printf("%f %f %f\n", boundPoints[0][0],
-                    //                          boundPoints[0][1],
-                    //                          boundPoints[0][2]);
-                    // }
                     
                     gdp_->setPos3(i, p);
                 }                  
@@ -463,6 +456,6 @@ SOP_Rain::cookMySop(OP_Context &context)
     }
     isParameterChanged_ = false;
     isPointsNumberChanged_ = false;
-    unlockInputs();
+    //unlockInputs();
     return error();
 }

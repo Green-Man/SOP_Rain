@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"act",
+				"actualSpeed_"
+			],
+			[
+				"fpr",
+				"fpreal"
+			],
+			[
 				"end",
 				"endsArray"
 			],
@@ -506,14 +514,6 @@
 			[
 				"vert",
 				"vertexPositions"
-			],
-			[
-				"inc",
-				"include"
-			],
-			[
-				"pix",
-				"pixels"
 			]
 		]
 	},
@@ -523,7 +523,7 @@
 			"file": "SOP_Rain.cpp",
 			"settings":
 			{
-				"buffer_size": 17324,
+				"buffer_size": 17016,
 				"line_ending": "Unix"
 			}
 		},
@@ -531,7 +531,7 @@
 			"file": "Rain.h",
 			"settings":
 			{
-				"buffer_size": 2321,
+				"buffer_size": 2513,
 				"line_ending": "Unix"
 			}
 		},
@@ -855,6 +855,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"isParameterChanged_",
+			"pointInitialPositions_",
 			"[i]",
 			"i",
 			"pointPair",
@@ -980,9 +982,7 @@
 			"pointInitialPositions_",
 			"test",
 			"pointInitialPositions_",
-			"printf",
-			"getInboundPoints",
-			"pointInitialPositions_"
+			"printf"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1019,15 +1019,15 @@
 					"file": "SOP_Rain.cpp",
 					"settings":
 					{
-						"buffer_size": 17324,
+						"buffer_size": 17016,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								13019,
-								13019
+								4117,
+								4117
 							]
 						],
 						"settings":
@@ -1041,7 +1041,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 6176.0,
+						"translation.y": 1715.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1051,15 +1051,15 @@
 					"file": "Rain.h",
 					"settings":
 					{
-						"buffer_size": 2321,
+						"buffer_size": 2513,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2179,
-								2179
+								409,
+								409
 							]
 						],
 						"settings":
@@ -1074,7 +1074,7 @@
 							"wrap_width": 80
 						},
 						"translation.x": 0.0,
-						"translation.y": 1425.0,
+						"translation.y": 361.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
