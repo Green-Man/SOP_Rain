@@ -12,13 +12,11 @@
 #include <tbb/tbb.h>
 
 
-
 #include "SOP_Rain.h"
 #include "Rain.h"
 
-#include <time.h>
-//#define DEBUG
 
+//#define DEBUG
 #ifdef DEBUG
 # define DEBUG_PRINT(x) printf x
 #else
@@ -41,23 +39,19 @@ static PRM_Default      defaultSpeed(3.0);
 static PRM_Name         nameSpeed("speed","Speed");
 
 static PRM_Range        rangeFps(PRM_RANGE_UI, 0.5, PRM_RANGE_UI, 60.0);
-static PRM_Default      defaultFps(24.0);
+static PRM_Default      defaultFps(24.0, "hou.fps()", CH_PYTHON_EXPRESSION);
 static PRM_Name         nameFps("fps", "Fps");
 
 static PRM_Name         nameBoundMin("bmin","BB Min");
 static PRM_Default      defaultBoundMin[] = 
                         {
-                            PRM_Default(-5.0),
-                            PRM_Default(0.0),
-                            PRM_Default(-5.0)
+                          PRM_Default(-5.0), PRM_Default(0.0), PRM_Default(-5.0)
                         };
 
 static PRM_Name         nameBoundMax("bmax","BB Max");
 static PRM_Default      defaultBoundMax[] = 
                         {
-                            PRM_Default(5.0),
-                            PRM_Default(10.0),
-                            PRM_Default(5.0)
+                           PRM_Default(5.0), PRM_Default(10.0), PRM_Default(5.0)
                         };
 static PRM_Range        rangeNpoints(PRM_RANGE_UI, 0, PRM_RANGE_UI, 10e+6);
 static PRM_Default      defaultNpoints(100);
@@ -78,9 +72,7 @@ static PRM_Name         nameDiceMax("diceMax", "Dice Max");
 static PRM_Name         nameRainDirection("dir", "Rain Dir");
 static PRM_Default      defaultRainDirection[] = 
                         {
-                            PRM_Default(0.0),
-                            PRM_Default(-1.0),
-                            PRM_Default(0.0)
+                           PRM_Default(0.0), PRM_Default(-1.0), PRM_Default(0.0)
                         };
 
 static PRM_Range        rangeSpeedVarience(PRM_RANGE_UI,0.0,PRM_RANGE_UI,1.0);
@@ -90,8 +82,6 @@ static PRM_Name         nameSpeedVarience("speedVarience","Speed Varience");
 static PRM_Range        rangeTime(PRM_RANGE_UI,0.0,PRM_RANGE_UI,1.0);
 static PRM_Default      defaultTime(0, "hou.time()", CH_PYTHON_EXPRESSION);
 static PRM_Name         nameTime("time","Time");                       
-
-
 
 PRM_Template SOP_Rain::myTemplateList[] = {
     PRM_Template(   PRM_FLT, 1, &nameSpeed, &defaultSpeed, 0, &rangeSpeed,
@@ -117,10 +107,6 @@ PRM_Template SOP_Rain::myTemplateList[] = {
 //##############################################################################
 //####################### End of Parameters ####################################
 
-
-bool SOP_Rain::isParameterChanged_ = true;
-bool SOP_Rain::isPointsNumberChanged_ = true;
-bool SOP_Rain::isPointsGenerated_ = false;
 int SOP_Rain::parmChanged(void * data, int,  float, const PRM_Template *)
 {
   isParameterChanged_ = true;
@@ -138,12 +124,14 @@ OP_Node* SOP_Rain::myConstructor(   OP_Network *net, const char *name,
                                     OP_Operator *op)
 {
     return new SOP_Rain(net, name, op);
-    //printf("SOP_Rain myconstructor...\n");
 }
 
 SOP_Rain::SOP_Rain(OP_Network *net, const char *name, OP_Operator *op)
     : SOP_Node(net, name, op)
 {
+    isPointsGenerated_ = false;
+    isParameterChanged_ = true;
+    isPointsNumberChanged_ = true;
 }
 
 SOP_Rain::~SOP_Rain()
@@ -154,16 +142,7 @@ SOP_Rain::~SOP_Rain()
 
 void SOP_Rain::generatePoints(GU_Detail* gdp, long n)
 {
-    //printf("Generate points\n");
-    GU_PrimParticle* partsys;
-    if (partsys = GU_PrimParticle::build(gdp, n))
-    {
-        GA_Primitive::const_iterator it;  
-        for(partsys->beginVertex(it); it.atEnd() == 0; ++it)
-        {
-            //gdp->setPos3(it.getPointOffset(), UT_Vector3(0,0,0));
-        }
-    }
+    GU_PrimParticle::build(gdp, n);
 }
 
 //==== Iinitialization of RainData static members ====
@@ -171,6 +150,12 @@ bool RainData::isInitialPositionAllocated_ = false;
 bool RainData::isInitialPositionCached_ = false;
 UT_Vector3* RainData::pointInitialPositions_;
 fpreal* RainData::actualSpeed_;
+//====================================================
+
+//==== Iinitialization of SOP_Rain static members ====
+bool SOP_Rain::isParameterChanged_;
+bool SOP_Rain::isPointsNumberChanged_;
+bool SOP_Rain::isPointsGenerated_;
 //====================================================
 
 RainData::RainData()
@@ -215,9 +200,9 @@ void ParallelInitialPositions::operator()
         bool placed;
         fpreal noiseValue;
         fpreal dice = 1.0;
-
         UT_Vector3  p, pSeed;
         UT_Matrix3 directionMatrix;
+
         for(long i=r.begin(); i != r.end(); ++i)
         {
             placed = false;
@@ -281,6 +266,12 @@ void ParallelShift::operator()(const GA_SplittableRange &r) const
         fpreal pathLength, pathPeriod;
         fpreal integralPart;
         UT_Vector3 boundPoints[2];
+        UT_Vector3 vAttributeVector;
+        
+        GA_WOAttributeRef vAttributeRef = 
+                                gdp_->addFloatTuple(GA_ATTRIB_POINT, "v", 3);
+        const GA_AIFTuple* vAttribInterface = vAttributeRef.getAIFTuple();
+
 
         for(GA_PageIterator pit = r.beginPages(); !pit.atEnd(); ++pit)
         {
@@ -290,6 +281,10 @@ void ParallelShift::operator()(const GA_SplittableRange &r) const
                 for (GA_Offset i = start; i < end; ++i)
                 {
                     actualSpeed = pRain_->getActualSpeed(i);
+                    vAttributeVector = pRain_->rainDirection_*actualSpeed;
+                    vAttribInterface->set(  vAttributeRef.getAttribute(), i,
+                                            vAttributeVector.data(), 3);
+                    
                     initialPosition = pRain_->getInitialPosition(i);
 
                     parm1x = (pRain_->maximumBounds_[0] - initialPosition[0]) / 
@@ -351,7 +346,7 @@ void ParallelShift::operator()(const GA_SplittableRange &r) const
 
                     pathLength = (boundPoints[0] - boundPoints[1]).length();
                     pathPeriod = pathLength / actualSpeed;
-                    parmInitial =   (initialPosition - boundPoints[0]).length() / 
+                    parmInitial =   (initialPosition - boundPoints[0]).length()/ 
                                     pathLength;
                     integralPart = parmInitial + pRain_->now_ / pathPeriod;                   
 
@@ -368,9 +363,7 @@ void ParallelShift::operator()(const GA_SplittableRange &r) const
 
 void RainData::shiftPositions(  GU_Detail* gdp, const GA_Range &range )
     {
-        // tbb::parallel_for(  tbb::blocked_range<long>( 0, pointsNumber_ ),
-        //                     ParallelShift( this, gdp ) );
-        UTparallelFor(GA_SplittableRange(range), ParallelShift( this, gdp ));
+        UTparallelFor(GA_SplittableRange(range), ParallelShift( this, gdp ), 2, 1);
     }
 
 ParallelShift::ParallelShift(   RainData* rain,
@@ -402,17 +395,12 @@ SOP_Rain::cookMySop(OP_Context &context)
     {
         //boss = UTgetInterrupt();
         //boss->opStart("Start generating rain");
-
-        
         
         fpreal now = TIME(context.getTime());
         long nPoints = NPOINTS( now );
         UT_Vector3 rainDirection = RAINDIRECTION(now);
         //rainDirection.normalize(); //TODO: check for (0,0,0) vector
 
-            //CLOCK
-        // clock_t start, end;
-        // start = clock();
         RainData rain(  now,
                         nPoints, BOUNDMIN (now), BOUNDMAX (now),
                         rainDirection, 
@@ -430,11 +418,10 @@ SOP_Rain::cookMySop(OP_Context &context)
             rain.computeInitialPositions();
             rain.setCachedState(true);     
         }
-        // end = clock();
-        // printf("positioning: %f\n", (double)(end-start)/CLOCKS_PER_SEC);
-            //CLOCK END
+
         if (isPointsGenerated_ == false)
         {
+            printf("Generate Points procedure\n");
             gdp->clearAndDestroy();
 
             generatePoints(gdp, nPoints);
@@ -450,6 +437,8 @@ SOP_Rain::cookMySop(OP_Context &context)
             GA_Range range = prim->getPointRange();
             rain.shiftPositions( gdp, range);            
         }
+
+
      
 
         //boss->opEnd();

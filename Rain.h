@@ -71,11 +71,9 @@ private:
     fpreal rndMax_;
     int seed_;
     fpreal constantSpeed_, speedVarience_, now_;
-
     Imath::Rand32 rndGenerator_;
     static UT_Vector3* pointInitialPositions_;
     static fpreal* actualSpeed_;
-
     static bool isInitialPositionCached_;
     static bool isInitialPositionAllocated_;
 };
@@ -95,7 +93,6 @@ class ParallelShift
 private:
     RainData* pRain_;
     GU_Detail* gdp_;
-
 public:
     void operator() (const GA_SplittableRange &r) const;
     ParallelShift(  RainData* rain,

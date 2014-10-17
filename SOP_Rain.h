@@ -3,22 +3,18 @@ class SOP_Rain : public SOP_Node
 public:
     SOP_Rain( OP_Network* net, const char* name, OP_Operator* op);
     virtual ~SOP_Rain();
-
     static PRM_Template    myTemplateList[];
     static OP_Node* myConstructor(OP_Network*, const char *, OP_Operator *);
-
 protected:
     virtual OP_ERROR     cookMySop(OP_Context &context);
-    
-
 private:
-    
     static bool isParameterChanged_;
     static bool isPointsNumberChanged_;
     static bool isPointsGenerated_;
     static int parmChanged(void *,int,float,const PRM_Template *);
     static int pointsNumberChanged(void *,int,float,const PRM_Template *);
     void generatePoints(GU_Detail* gdp, long n);
+
     fpreal  SPEED(float t)   { return evalFloat( 0, 0, t); }
     fpreal  FPS(float t)   { return evalFloat( 1, 0, t); }
     UT_Vector3 BOUNDMIN(float t)
